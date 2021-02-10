@@ -32,10 +32,10 @@ class Configuration:
         :return:
         """
         section = None
-        value = str(kwargs.get('value'))
-        key = str(kwargs.get('key'))
-        if 'section' in kwargs:
-            section = str(kwargs.get('section')) or None
+        value = str(kwargs.get("value"))
+        key = str(kwargs.get("key"))
+        if "section" in kwargs:
+            section = str(kwargs.get("section")) or None
         if section is not None:
             self._config[section][key] = value
         else:
@@ -48,10 +48,10 @@ class Configuration:
         :return:
         """
         section = None
-        value = str(kwargs.get('value'))
-        key = str(kwargs.get('key'))
-        if 'section' in kwargs:
-            section = str(kwargs.get('section')) or None
+        value = str(kwargs.get("value"))
+        key = str(kwargs.get("key"))
+        if "section" in kwargs:
+            section = str(kwargs.get("section")) or None
 
         if section is not None:
             return self._config[section][key] or False

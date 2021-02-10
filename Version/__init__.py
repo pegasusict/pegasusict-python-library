@@ -23,16 +23,34 @@ class VersionError(Exception):
     pass
 
 
-class Version(namedtuple('VersionBase', 'major minor patch identifier revision build')):
+class Version(namedtuple("VersionBase", "major minor patch identifier revision build")):
     # {'major': 3, 'minor': 4, 'patch': 5, 'prerelease': 'pre.2', 'build': 'build.4'}
     _version_re = re.compile(
         r"/(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*["
         r"a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>["
-        r"0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/gm")
-    _identifiers = {'dev': 0, 'alpha': 1, 'a': 1, 'beta': 2, 'b': 2, 'rc': 3, 'pre': 4, 'final': 5}
-    _build: str = ''
+        r"0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/gm"
+    )
+    _identifiers = {
+        "dev": 0,
+        "alpha": 1,
+        "a": 1,
+        "beta": 2,
+        "b": 2,
+        "rc": 3,
+        "pre": 4,
+        "final": 5,
+    }
+    _build: str = ""
 
-    def __new__(cls, major: int, minor: int = 0, patch: int = 0, rel: str = 'final', rev: int = 0, build: str = None):
+    def __new__(
+        cls,
+        major: int,
+        minor: int = 0,
+        patch: int = 0,
+        rel: str = "final",
+        rev: int = 0,
+        build: str = None,
+    ):
         """
 
         :type major: int
@@ -43,15 +61,19 @@ class Version(namedtuple('VersionBase', 'major minor patch identifier revision b
         :type build: string
         """
         if rel not in cls.valid_phases():
-            raise VersionError("Should be either 'final', 'pre', 'rc', 'beta', 'alpha' or 'dev'")
-        rel = {'a': 'alpha', 'b': 'beta'}.get(rel, rel)
+            raise VersionError(
+                "Should be either 'final', 'pre', 'rc', 'beta', 'alpha' or 'dev'"
+            )
+        rel = {"a": "alpha", "b": "beta"}.get(rel, rel)
         try:
             major = int(major)
             minor = int(minor)
             patch = int(patch)
             rev = int(rev)
         except (TypeError, ValueError):
-            raise VersionError("major, minor, patch and revision must be integer values")
+            raise VersionError(
+                "major, minor, patch and revision must be integer values"
+            )
         return super(Version, cls).__new__(cls, major, minor, patch, rel, rev, build)
 
     @classmethod
@@ -70,28 +92,31 @@ class Version(namedtuple('VersionBase', 'major minor patch identifier revision b
                 return Version(major, minor, patch)
             revision = int(revision)
             return Version(major, minor, patch, identifier, revision)
-        raise VersionError("String '%s' does not match regex '%s'" % (version_str, cls._version_re.pattern))
+        raise VersionError(
+            "String '%s' does not match regex '%s'"
+            % (version_str, cls._version_re.pattern)
+        )
 
     @classmethod
     def valid_phases(cls):
         return set(cls._identifiers.keys())
 
     def to_string(self, short=False):
-        if short and self.identifier in ('alpha', 'beta'):
+        if short and self.identifier in ("alpha", "beta"):
             version = self._replace(identifier=self.identifier[0])
         else:
             version = self
-        if short and version.identifier == 'final':
+        if short and version.identifier == "final":
             if version.patch == 0:
-                version_str = '%d.%d' % version[:2]
+                version_str = "%d.%d" % version[:2]
             else:
-                version_str = '%d.%d.%d' % version[:3]
-        elif short and version.identifier in ('a', 'b', 'rc'):
-            version_str = '%d.%d.%d-%s%d' % version
+                version_str = "%d.%d.%d" % version[:3]
+        elif short and version.identifier in ("a", "b", "rc"):
+            version_str = "%d.%d.%d-%s%d" % version
         elif version.get_build is not None:
-            version_str = '%d.%d.%d-%s%d+%s' % version
+            version_str = "%d.%d.%d-%s%d+%s" % version
         else:
-            version_str = '%d.%d.%d-%s%d' % version
+            version_str = "%d.%d.%d-%s%d" % version
         return version_str
 
     @property
@@ -134,14 +159,16 @@ class Version(namedtuple('VersionBase', 'major minor patch identifier revision b
     def __hash__(self):
         return super().__hash__()
 
-    def set_build(self, year: int, month: int, day: int, iteration: int = None) -> object:
+    def set_build(
+        self, year: int, month: int, day: int, iteration: int = None
+    ) -> object:
         """Sets build string
 
         :rtype: Version
         """
-        _build = date(year, month, day).strftime('%Y%m%d')
+        _build = date(year, month, day).strftime("%Y%m%d")
         if iteration > 0:
-            self._build = str(_build) + '.' + str(iteration)
+            self._build = str(_build) + "." + str(iteration)
         else:
             self._build = str(_build)
         return self

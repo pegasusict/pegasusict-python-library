@@ -21,17 +21,17 @@ import PPL
 
 class Configuration:
     _extensions = {
-        'ini': ('cfg', 'ini', 'conf', 'cnf'),
-        'json': ('json', 'jsn'),
-        'toml': ('toml', 'tml'),
-        'yaml': ('yaml', 'yml')
+        "ini": ("cfg", "ini", "conf", "cnf"),
+        "json": ("json", "jsn"),
+        "toml": ("toml", "tml"),
+        "yaml": ("yaml", "yml"),
     }
     _config = None
     _file_config = None
     _env = None
     _args = None
     _basedir: str = None
-    _filetype = 'ini'
+    _filetype = "ini"
     _filename = "config.ini"
 
     def __init__(self, **kwargs):
@@ -40,8 +40,8 @@ class Configuration:
         :arg filetype: string
         :arg basedir: string"""
         self._basedir = path.abspath(path.dirname(__file__))
-        if 'basedir' in kwargs:
-            self._basedir = str(kwargs.get('basedir'))
+        if "basedir" in kwargs:
+            self._basedir = str(kwargs.get("basedir"))
         # parse environment
         self._parse_env()
 
@@ -49,17 +49,25 @@ class Configuration:
         filename = self._filename
         filetype = self._filetype
         module_name = "Ini"
-        if 'type' in kwargs and kwargs.get('type') in set(self._extensions.keys()):
-            module_name = str(kwargs.get('type')).capitalize()
-        if 'filename' in kwargs:
+        if "type" in kwargs and kwargs.get("type") in set(self._extensions.keys()):
+            module_name = str(kwargs.get("type")).capitalize()
+        if "filename" in kwargs:
             filename = kwargs.get("filename")
         if self._check_file(filetype, filename):
             self._config = PPL.load(__name__, module_name)
         # parse arguments
-        parser = argparse.ArgumentParser(description='Configure AMM Core')
+        parser = argparse.ArgumentParser(description="Configure AMM Core")
         arg_group = parser.add_mutually_exclusive_group()
-        arg_group.add_argument("-v", "--verbose", default=1, action="store_true", help="Increase feedback level.")
-        arg_group.add_argument("-q", "--quiet", action="store_true", help="Mute feedback.")
+        arg_group.add_argument(
+            "-v",
+            "--verbose",
+            default=1,
+            action="store_true",
+            help="Increase feedback level.",
+        )
+        arg_group.add_argument(
+            "-q", "--quiet", action="store_true", help="Mute feedback."
+        )
         parser.parse_args()
 
     def set(self, **kwargs):
@@ -68,16 +76,16 @@ class Configuration:
         :param kwargs:
         :return:
         """
-        if 'value' in kwargs:
-            value = str(kwargs.get('value'))
+        if "value" in kwargs:
+            value = str(kwargs.get("value"))
         else:
             raise ValueError("Value is a mandatory argument")
-        if 'key' in kwargs:
-            key = str(kwargs.get('key'))
+        if "key" in kwargs:
+            key = str(kwargs.get("key"))
         else:
             raise ValueError("Key is a mandatory argument")
-        if 'section' in kwargs:
-            section = str(kwargs.get('section'))
+        if "section" in kwargs:
+            section = str(kwargs.get("section"))
             self._config.set(section=section, key=key, value=value)
         else:
             self._config.set(key=key, value=value)
@@ -89,16 +97,16 @@ class Configuration:
         :return:
         """
         section = None
-        if 'value' in kwargs:
-            value = str(kwargs.get('value'))
+        if "value" in kwargs:
+            value = str(kwargs.get("value"))
         else:
             raise ValueError("Value is a mandatory argument")
-        if 'key' in kwargs:
-            key = str(kwargs.get('key'))
+        if "key" in kwargs:
+            key = str(kwargs.get("key"))
         else:
             raise ValueError("Key is a mandatory argument")
-        if 'section' in kwargs:
-            section = str(kwargs.get('section'))
+        if "section" in kwargs:
+            section = str(kwargs.get("section"))
             return self._config[section][key] or False
         else:
             return self._config[key] or False
@@ -107,13 +115,15 @@ class Configuration:
         pass
 
     def _parse_env(self):
-        self._env = load_dotenv(path.join(self._basedir, '../.env'))
+        self._env = load_dotenv(path.join(self._basedir, "../.env"))
 
     def _parse_toml(self, filename: str):
         self._file_config = toml.load(filename)
 
     def _parse_yaml(self, filename: str):
-        self._file_config = confuse.Configuration(globals()['AMM_APP_NAME'], self._filename)
+        self._file_config = confuse.Configuration(
+            globals()["AMM_APP_NAME"], self._filename
+        )
 
     def _check_file(self, filetype: str, filename: str) -> bool:
         has_ext = False
