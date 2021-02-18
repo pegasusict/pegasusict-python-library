@@ -13,74 +13,75 @@
 #
 #  You should have received a copy of the GNU General Public License
 #   along with PPL.  If not, see <https://www.gnu.org/licenses/>.
-
+"""Version related classes, Semantic Versioning compatible though somewhat stricter. v0.1.0-alpha+20210213"""
 import re
 from collections import namedtuple
 from datetime import date
 
 
 class VersionError(Exception):
+    """Used to raise Errors form PPL's Version class"""
+
     pass
 
 
-class Version(namedtuple("VersionBase", "major minor patch identifier revision build")):
-    # {'major': 3, 'minor': 4, 'patch': 5, 'prerelease': 'pre.2', 'build': 'build.4'}
+class Version(
+    namedtuple("VersionBase", "major minor patch release revision build", defaults=(0, 0, 0, "final", 0, None))
+):
+    """Semantic Version compatible."""
+
+    # noinspection PyMissingConstructor
+    def __init__(self, major=0, minor=0, patch=0, release="final", revision=0, build=None):
+        self._major = major or 0
+        self._minor = minor or 0
+        self._patch = patch or 0
+        self._release = release or "final"
+        self._revision = revision or 0
+        self._build = build or None
+
     _version_re = re.compile(
-        r"/(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*["
-        r"a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>["
-        r"0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/gm"
+        r"/(?P<major>0|[1-9]\d*)"
+        r"\.(?P<minor>0|[1-9]\d*)"
+        r"\.(?P<patch>0|[1-9]\d*)"
+        r"(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
+        r"(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/gm"
     )
-    _identifiers = {
-        "dev": 0,
-        "alpha": 1,
-        "a": 1,
-        "beta": 2,
-        "b": 2,
-        "rc": 3,
-        "pre": 4,
-        "final": 5,
-    }
+    _releases = {"dev": 0, "test": 1, "alpha": 2, "a": 2, "beta": 3, "b": 3, "rc": 4, "pre": 5, "final": 6}
     _build: str = ""
 
-    def __new__(
-        cls,
-        major: int,
-        minor: int = 0,
-        patch: int = 0,
-        rel: str = "final",
-        rev: int = 0,
-        build: str = None,
-    ):
+    def __new__(cls, major=0, minor=0, patch=0, release="final", revision=0, build=None):
         """
 
         :type major: int
         :type minor: int
         :type patch: int
-        :type rel: string
-        :type rev: int
+        :type release: string
+        :type revision: int
         :type build: string
         """
-        if rel not in cls.valid_phases():
-            raise VersionError(
-                "Should be either 'final', 'pre', 'rc', 'beta', 'alpha' or 'dev'"
-            )
-        rel = {"a": "alpha", "b": "beta"}.get(rel, rel)
+        if release not in cls.valid_releases():
+            raise VersionError("Release should be either 'final', 'pre', 'rc', 'beta', 'alpha' or 'dev'")
+        release = {"a": "alpha", "b": "beta"}.get(release, release)
         try:
             major = int(major)
             minor = int(minor)
             patch = int(patch)
-            rev = int(rev)
+            revision = int(revision)
         except (TypeError, ValueError):
-            raise VersionError(
-                "major, minor, patch and revision must be integer values"
-            )
-        return super(Version, cls).__new__(cls, major, minor, patch, rel, rev, build)
+            raise VersionError("major, minor, patch and revision must be integer values")
+        # noinspection PyArgumentList
+        return super(Version, cls).__new__(cls, major, minor, patch, release, revision, build)
 
     @classmethod
     def from_string(cls, version_str):
+        """
+
+        :param version_str:
+        :return:
+        """
         match = cls._version_re.search(version_str)
         if match:
-            (major, minor, patch, identifier, revision) = match.groups()
+            (major, minor, patch, release, revision) = match.groups()
             major = int(major)
             if minor is None:
                 return Version(major)
@@ -88,30 +89,36 @@ class Version(namedtuple("VersionBase", "major minor patch identifier revision b
             if patch is None:
                 return Version(major, minor)
             patch = int(patch)
-            if identifier is None:
+            if release is None:
                 return Version(major, minor, patch)
             revision = int(revision)
-            return Version(major, minor, patch, identifier, revision)
-        raise VersionError(
-            "String '%s' does not match regex '%s'"
-            % (version_str, cls._version_re.pattern)
-        )
+            return Version(major, minor, patch, release, revision)
+        raise VersionError("String '%s' does not match regex '%s'" % (version_str, cls._version_re.pattern))
 
     @classmethod
-    def valid_phases(cls):
-        return set(cls._identifiers.keys())
+    def valid_releases(cls):
+        """
+
+        :return:
+        """
+        return set(cls._releases.keys())
 
     def to_string(self, short=False):
-        if short and self.identifier in ("alpha", "beta"):
-            version = self._replace(identifier=self.identifier[0])
+        """
+
+        :param short:
+        :return:
+        """
+        if short and self._release in ("alpha", "beta"):
+            version = self._replace(release=self._release[0])
         else:
             version = self
-        if short and version.identifier == "final":
-            if version.patch == 0:
+        if short and version._release == "final":
+            if version._patch == 0:
                 version_str = "%d.%d" % version[:2]
             else:
                 version_str = "%d.%d.%d" % version[:3]
-        elif short and version.identifier in ("a", "b", "rc"):
+        elif short and version._release in ("a", "b", "rc"):
             version_str = "%d.%d.%d-%s%d" % version
         elif version.get_build is not None:
             version_str = "%d.%d.%d-%s%d+%s" % version
@@ -121,47 +128,49 @@ class Version(namedtuple("VersionBase", "major minor patch identifier revision b
 
     @property
     def sort_key(self):
-        return self[:3] + (self._identifiers.get(self.identifier, 0), self.revision)
+        """
+
+        :return:
+        """
+        return self[:3] + (self._releases.get(self._release, 0), self._revision)
 
     def __str__(self):
         return self.to_string()
 
     def __lt__(self, other):
         if not isinstance(other, Version):
-            other = Version(*other)
+            other = Version()
         return self.sort_key < other.sort_key
 
     def __le__(self, other):
         if not isinstance(other, Version):
-            other = Version(*other)
+            other = Version()
         return self.sort_key <= other.sort_key
 
     def __gt__(self, other):
         if not isinstance(other, Version):
-            other = Version(*other)
+            other = Version()
         return self.sort_key > other.sort_key
 
     def __ge__(self, other):
         if not isinstance(other, Version):
-            other = Version(*other)
+            other = Version()
         return self.sort_key >= other.sort_key
 
     def __eq__(self, other):
         if not isinstance(other, Version):
-            other = Version(*other)
+            other = Version()
         return self.sort_key == other.sort_key
 
     def __ne__(self, other):
         if not isinstance(other, Version):
-            other = Version(*other)
+            other = Version()
         return self.sort_key != other.sort_key
 
     def __hash__(self):
         return super().__hash__()
 
-    def set_build(
-        self, year: int, month: int, day: int, iteration: int = None
-    ) -> object:
+    def set_build(self, year: int, month: int, day: int, iteration: int = None) -> object:
         """Sets build string
 
         :rtype: Version
@@ -173,8 +182,9 @@ class Version(namedtuple("VersionBase", "major minor patch identifier revision b
             self._build = str(_build)
         return self
 
-    def get_build(self):
-        if self._build is not None:
-            return str(self._build)
-        else:
-            return None
+    def get_build(self) -> str or None:
+        """
+
+        :return:
+        """
+        return self._build

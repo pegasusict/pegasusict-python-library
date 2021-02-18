@@ -11,3 +11,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #   along with AMM.  If not, see <https://www.gnu.org/licenses/>.
+from PPL.Configuration import ConfigurationSuper
+
+
+class Configuration(ConfigurationSuper):
+    """
+    Yaml configuration
+    """

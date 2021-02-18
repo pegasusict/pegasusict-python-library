@@ -13,17 +13,23 @@
 #   along with AMM.  If not, see <https://www.gnu.org/licenses/>.
 from configparser import ConfigParser
 
+import PPL.Configuration as ConfigurationModule
+from PPL.Configuration import ConfigurationSuper
 
-class Configuration:
+
+class Configuration(ConfigurationSuper):
     """Ini file based configuration module
     :arg: filename
     """
 
-    _config = list()
+    _config = dict()
 
     def __init__(self, filename: str):
-        _parser = ConfigParser()
-        self._config = _parser.read(filename)
+        _parser = ConfigParser(default_section=ConfigurationModule.DEFAULT_SECTION)
+        _files_found = _parser.read(filename)
+        _parser.read_file(filename)
+        _sections = _parser.sections()
+        _sections.append("general")
 
     def set(self, **kwargs):
         """Sets config value to [section]key
