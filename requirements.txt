@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-pip>=21.0.1
-pytest
 confuse>=1.4.0
 black >= 20.8b1
 decorator >= 4.4.2
@@ -8,6 +6,6 @@ envargparse	>= 1.0.0
 pytest >= 6.2.2
 semver >= 2.13.0
 semver-git-hook	>= 1.0.5
-setuptools	>= 53.0.0
+setuptools==65.5.0
 termcolor >= 1.1.0
 toml >= 0.10.2

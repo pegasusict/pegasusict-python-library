@@ -12,9 +12,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #   along with PPL.  If not, see <https://www.gnu.org/licenses/>.
-from os import path
 import abc
-from io import TextIOBase
+from os import path
+import argparse
+from envdefault import EnvDefault
 
 global config_file_type
 global config_file_name
@@ -23,13 +24,16 @@ global DEFAULT_SECTION
 
 
 class ConfigurationSelector:
-    """Is used to choose a particular Configuration Variant"""
+    """Is used to choose/detect (a) Configuration Variation(s)"""
 
     EXTENSIONS = {
         "ini": ("cfg", "ini", "conf", "cnf"),
         "json": ("json", "jsn"),
         "toml": ("toml", "tml"),
         "yaml": ("yaml", "yml"),
+    }
+    DEFAULT_PRIORITY = {
+        "arg", "env", "ini", "json", "toml", "yaml"
     }
 
     @classmethod
@@ -94,14 +98,14 @@ class ConfigurationInterface(metaclass=abc.ABCMeta):
     @classmethod
     def __subclasshook__(cls, subclass):
         return (
-            hasattr(subclass, "get_value")
-            and callable(subclass.get_value)
-            and hasattr(subclass, "set_value")
-            and callable(subclass.set_value)
-            and hasattr(subclass, "save")
-            and callable(subclass.save)
-            and hasattr(subclass, "load")
-            and callable(subclass.load)
+                hasattr(subclass, "get_value")
+                and callable(subclass.get_value)
+                and hasattr(subclass, "set_value")
+                and callable(subclass.set_value)
+                and hasattr(subclass, "save")
+                and callable(subclass.save)
+                and hasattr(subclass, "load")
+                and callable(subclass.load)
         )
 
 
@@ -110,6 +114,15 @@ def _load_defaults():
     global DEFAULT_SECTION
 
     DEFAULT_SECTION = "general"
+
+
+def _parse_env(env_args):
+    parser = argparse.ArgumentParser()
+    for arg in env_args:
+        parser.add_argument(
+            "-u", "--url", action=EnvDefault, envvar='URL',
+            help="Specify the URL to process (can also be specified using URL environment variable)")
+    args = parser.parse_args()
 
 
 class ConfigurationSuper:
@@ -126,7 +139,7 @@ class ConfigurationSuper:
         """
         self._filename: str = ""
         _load_defaults()
-        self._parse_env()
+        _parse_env()
         self._filetype: str = ""
 
         # parse file
@@ -135,7 +148,7 @@ class ConfigurationSuper:
         module_name = "Ini"
 
         # parse arguments
-        parser = argparse.ArgumentParser(description="Configure AMM Core")
+        parser = envargparse.EnvArgParser()
         arg_group = parser.add_mutually_exclusive_group()
         arg_group.add_argument(
             "-v",
@@ -147,14 +160,17 @@ class ConfigurationSuper:
         arg_group.add_argument("-q", "--quiet", action="store_true", help="Mute feedback.")
         parser.parse_args()
 
-    def _open_file(self, file_path: str, encoding="utf-8"):
+    def _open_file(self, file_path: str, encoding="utf-8", mode="r"):
         """Opens file in read/write mode and hands back the file object.
 
         file_path: str
         encoding: str
         """
-        self.file_object = io.
-        (file_path, mode="+", encoding=encoding)
+        if mode == "w":
+            mode = "w"
+        else:
+            mode = "r"
+        self.file_object = open(file_path, mode)
         self.file_contents = self.file_object.read()
 
     def set(self, **kwargs):
@@ -197,4 +213,4 @@ class ConfigurationSuper:
         """
         placeholder for save function in subclasses
         """
-        pass
+        self.file_object.write()

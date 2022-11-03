@@ -14,9 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #   along with PPL.  If not, see <https://www.gnu.org/licenses/>.
 """Example use of PPL"""
+from PPL import Configuration
 from PPL.Version import Version
 
 MyVersion = Version(minor=1)
 print(MyVersion)
 
-# config = PPL.
+config = Configuration
