@@ -14,8 +14,7 @@
 #   along with PPL.  If not, see <https://www.gnu.org/licenses/>.
 import abc
 from os import path
-import argparse
-from envdefault import EnvDefault
+import envargparse
 
 global config_file_type
 global config_file_name
@@ -113,7 +112,7 @@ def _load_defaults():
     """loads common configuration defaults"""
     global DEFAULT_SECTION
 
-    DEFAULT_SECTION = "general"
+    DEFAULT_SECTION = "main"
 
 
 def _parse_env(env_args):
