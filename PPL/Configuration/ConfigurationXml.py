@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  Copyleft  2021-2024 Mattijs Snepvangers.
 #  This file is part of Audiophiles' Music Manager, hereafter named AMM.
 #
@@ -12,15 +13,13 @@
 #  You should have received a copy of the GNU General Public License
 #   along with AMM.  If not, see <https://www.gnu.org/licenses/>.
 from PPL.Configuration import ConfigurationSuper
-import yaml
+from xmlobj import get_xml_obj
+import xml.etree.cElementTree as ElementTree
 
 
 class ConfigurationXml(ConfigurationSuper):
-    """
-    Yaml configuration
-    """
+    """XML based Configuration"""
 
-    def __init__(self, filepath: str):
+    def __init__(self, filename: str):
         super().__init__()
-        file_contents = open(filepath)
-        self._config = yaml.safe_load(file_contents)
+        self._config = get_xml_obj(filename)

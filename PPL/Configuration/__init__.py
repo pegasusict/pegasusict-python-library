@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#  Copyleft  2021 Mattijs Snepvangers.
+#  Copyleft  2021-2024 Mattijs Snepvangers.
 #  This file is part of Pegasus-ICT Python Library, hereafter named PPL.
 #
 #  PPL is free software: you can redistribute it and/or modify  it under the terms of the
@@ -12,14 +12,34 @@
 #
 #  You should have received a copy of the GNU General Public License
 #   along with PPL.  If not, see <https://www.gnu.org/licenses/>.
-import abc
-from os import path
-import envargparse
 
-global config_file_type
-global config_file_name
-global config_path
-global DEFAULT_SECTION
+import abc
+import envargparse
+from os import path
+
+global config_file_type, config_file_name, config_path, DEFAULT_SECTION
+
+
+def _load_defaults():
+    """
+        loads common configuration defaults
+    """
+    global DEFAULT_SECTION
+    DEFAULT_SECTION = "main"
+
+
+def _parse_env(env_args: dict):
+    """
+    Parse Argument and ENV variables
+    :param env_args: (arg(
+    :return:
+    """
+    parser = envargparse.EnvArgParser()
+    for arg in env_args:
+        parser.add_argument(
+            "-u", "--url", envvar='URL',
+            help="Specify the URL to process (can also be specified using URL environment variable)")
+    args = parser.parse_args()
 
 
 class ConfigurationSelector:
@@ -29,10 +49,8 @@ class ConfigurationSelector:
         "ini": ("cfg", "ini", "conf", "cnf"),
         "json": ("json", "jsn"),
         "toml": ("toml", "tml"),
+        "xml": ("xml", "xlt"),
         "yaml": ("yaml", "yml"),
-    }
-    DEFAULT_PRIORITY = {
-        "arg", "env", "ini", "json", "toml", "yaml"
     }
 
     @classmethod
@@ -58,6 +76,8 @@ class ConfigurationSelector:
                 from ConfigurationYaml import Configuration
             elif config_file_type == "toml":
                 from ConfigurationToml import Configuration
+            elif config_file_type == "xml":
+                from ConfigurationXml import Configuration
             elif config_file_type == "json":
                 from ConfigurationJson import Configuration
             else:
@@ -108,22 +128,6 @@ class ConfigurationInterface(metaclass=abc.ABCMeta):
         )
 
 
-def _load_defaults():
-    """loads common configuration defaults"""
-    global DEFAULT_SECTION
-
-    DEFAULT_SECTION = "main"
-
-
-def _parse_env(env_args):
-    parser = argparse.ArgumentParser()
-    for arg in env_args:
-        parser.add_argument(
-            "-u", "--url", action=EnvDefault, envvar='URL',
-            help="Specify the URL to process (can also be specified using URL environment variable)")
-    args = parser.parse_args()
-
-
 class ConfigurationSuper:
     """ConfigurationSuper base class"""
 
@@ -159,7 +163,7 @@ class ConfigurationSuper:
         arg_group.add_argument("-q", "--quiet", action="store_true", help="Mute feedback.")
         parser.parse_args()
 
-    def _open_file(self, file_path: str, encoding="utf-8", mode="r"):
+    def _read_file(self, file_path: str, encoding="utf-8", mode="r"):
         """Opens file in read/write mode and hands back the file object.
 
         file_path: str
@@ -188,9 +192,9 @@ class ConfigurationSuper:
             raise ValueError("Key is a mandatory argument")
         if "section" in kwargs:
             section = str(kwargs.get("section"))
-            self._config.set(section=section, key=key, value=value)
+            self._config[section][key] = value
         else:
-            self._config.set(key=key, value=value)
+            self._config[key] = value
 
     def get(self, **kwargs):
         """Get config value from [section]key
