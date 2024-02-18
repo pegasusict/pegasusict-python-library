@@ -28,6 +28,7 @@ def _load_defaults():
     DEFAULT_SECTION = "main"
 
 
+# TODO: fix env/arg parsing
 def _parse_env(env_args: dict):
     """
     Parse Argument and ENV variables

@@ -30,13 +30,13 @@ global USER_DESKTOP_DIR, CONFIG
 
 def set_app_defaults(appname: str, author: str = "Mattijs Snepvangers", version: str = '0.0.0', **kwargs):
     """
-            :param appname:str      Application Name, defaults to 'UnknownApp'
-            :param author:str       Application Author Name, defaults to 'Mattijs Snepvangers'
-            :param version:str      Application Version, defaults to '0.0.0'
-            :param opinion:bool     Whether to follow developers' opinion
-            :param roaming:bool     Whether to use roaming data profiles on windows networked profiles
-            :param multipath:bool   Whether to use roaming data profiles on windows networked profiles
-            :param ensure_exists:   Makes sure directory exists, default: True
+            :param appname:str          Application Name, defaults to 'UnknownApp'
+            :param author:str           Application Author Name, defaults to 'Mattijs Snepvangers'
+            :param version:str          Application Version, defaults to '0.0.0'
+            :param opinion:bool         Whether to follow developers' opinion
+            :param roaming:bool         Whether to use roaming data profiles on windows networked profiles
+            :param multipath:bool       Whether to use roaming data profiles on windows networked profiles
+            :param ensure_exists:bool   Makes sure directory exists, default: True
     """
     global USER_APP_DIR, SYS_APP_DIR, USER_CACHE_DIR, SYS_CACHE_DIR
     global USER_CFG_DIR, SYS_CFG_DIR, USER_DATA_DIR, SYS_DATA_DIR

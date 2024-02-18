@@ -14,7 +14,6 @@
 #   along with AMM.  If not, see <https://www.gnu.org/licenses/>.
 from PPL.Configuration import ConfigurationSuper
 from xmlobj import get_xml_obj
-import xml.etree.cElementTree as ElementTree
 
 
 class ConfigurationXml(ConfigurationSuper):
