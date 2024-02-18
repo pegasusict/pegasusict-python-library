@@ -6,10 +6,9 @@ envargparse	>= 1.0.0
 pytest >= 6.2.2
 semver >= 2.13.0
 semver-git-hook	>= 1.0.5
-setuptools >= 65.5.0
+setuptools >= 65.5.1
 termcolor >= 1.1.0
 toml >= 0.10.2
-
-xmlobj>=1.2.2
-platformdirs>=4.2.0
-PyYAML>=6.0.1
+xmlobj >= 1.2.2
+platformdirs >= 4.2.0
+PyYAML >= 6.0.1
