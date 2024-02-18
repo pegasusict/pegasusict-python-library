@@ -1,4 +1,5 @@
-#  Copyleft  2021 Mattijs Snepvangers.
+# -*- coding: utf-8 -*-
+#  Copyleft  2021-2024 Mattijs Snepvangers.
 #  This file is part of Audiophiles' Music Manager, hereafter named AMM.
 #
 #  AMM is free software: you can redistribute it and/or modify  it under the terms of the
@@ -11,25 +12,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #   along with AMM.  If not, see <https://www.gnu.org/licenses/>.
-
-# import PPL.Configuration as Module
 from PPL.Configuration import ConfigurationSuper
-import json
+from xmlobj import get_xml_obj
+import xml.etree.cElementTree as ElementTree
 
 
-class ConfigurationJson(ConfigurationSuper):
-    """JSON based Configuration"""
+class ConfigurationXml(ConfigurationSuper):
+    """XML based Configuration"""
 
     def __init__(self, filename: str):
         super().__init__()
-        _json = json.load(super()._open_file(filename).read())
-        _sections = _json.sections()
-        _sections.append("general")
-
-    def load(self):
-        """Save modified configuration data to file."""
-        pass
-
-    def save(self):
-        """Save modified configuration data to file."""
-        pass
+        self._config = get_xml_obj(filename)

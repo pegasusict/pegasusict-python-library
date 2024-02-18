@@ -1,6 +1,5 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
-#  Copyleft 2021-2024 Mattijs Snepvangers.
+#  Copyleft  2021-2024 Mattijs Snepvangers.
 #  This file is part of Pegasus-ICT Python Library, hereafter named PPL.
 #
 #  PPL is free software: you can redistribute it and/or modify  it under the terms of the
@@ -13,11 +12,3 @@
 #
 #  You should have received a copy of the GNU General Public License
 #   along with PPL.  If not, see <https://www.gnu.org/licenses/>.
-"""Example use of PPL"""
-from PPL import Configuration
-from PPL.Version import Version
-
-MyVersion = Version(minor=1)
-print(MyVersion)
-
-config = Configuration

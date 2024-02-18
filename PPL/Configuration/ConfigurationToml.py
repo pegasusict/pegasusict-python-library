@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  Copyleft  2021 Mattijs Snepvangers.
 #  This file is part of Audiophiles' Music Manager, hereafter named AMM.
 #
@@ -15,14 +16,10 @@
 from PPL.Configuration import ConfigurationSuper
 import toml
 
-# import io
 
-
-class Configuration(ConfigurationSuper):
-    """JSON based Configuration"""
+class ConfigurationToml(ConfigurationSuper):
+    """Toml based Configuration"""
 
     def __init__(self, filename: str):
         super().__init__()
-        _config = toml.load(filename)
-        # _sections = _json.sections()
-        # _sections.append("general")
+        _config = toml.decoder.load(filename)

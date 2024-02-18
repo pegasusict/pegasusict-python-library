@@ -1,4 +1,4 @@
-#  Copyleft  2021 Mattijs Snepvangers.
+#  Copyleft  2021-2024 Mattijs Snepvangers.
 #  This file is part of Audiophiles' Music Manager, hereafter named AMM.
 #
 #  AMM is free software: you can redistribute it and/or modify  it under the terms of the
@@ -12,9 +12,15 @@
 #  You should have received a copy of the GNU General Public License
 #   along with AMM.  If not, see <https://www.gnu.org/licenses/>.
 from PPL.Configuration import ConfigurationSuper
+import yaml
 
 
-class Configuration(ConfigurationSuper):
+class ConfigurationXml(ConfigurationSuper):
     """
     Yaml configuration
     """
+
+    def __init__(self, filepath: str):
+        super().__init__()
+        file_contents = open(filepath)
+        self._config = yaml.safe_load(file_contents)
