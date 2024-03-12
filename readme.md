@@ -10,7 +10,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # Pegasus-ICT Python Library V0.0.0-DEV
-Updated: 2024-02-18   
+Updated: 2024-03-09   
 Copyleft: 2021-2024 Mattijs Snepvangers  
 Licence: GPL v3+
 
@@ -30,10 +30,18 @@ My goal is to write a Python Library which consists of commonly used classes in 
     * mongoDB
 * Logging
 * Communication
+  * sms
+  * email
+  * discord
+  * whatsapp
+  * Tasker integration
 * FileSystem interaction
 * lockfile(s) system
 * RPC
+  * rest
+  * webhook
 * UI
   * CLI
   * GUI
   * web interface
+* watchdog

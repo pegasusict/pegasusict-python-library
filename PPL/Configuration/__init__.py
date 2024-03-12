@@ -28,18 +28,20 @@ def _load_defaults():
     DEFAULT_SECTION = "main"
 
 
-# TODO: fix env/arg parsing
 def _parse_env(env_args: dict):
     """
     Parse Argument and ENV variables
     :param env_args: (arg(
     :return:
     """
+    if len(env_args) == 0:
+        return None
     parser = envargparse.EnvArgParser()
     for arg in env_args:
         parser.add_argument(
-            "-u", "--url", envvar='URL',
-            help="Specify the URL to process (can also be specified using URL environment variable)")
+            # "-u", "--url", envvar='URL',
+            # help="Specify the URL to process (can also be specified using URL environment variable)"
+        )
     args = parser.parse_args()
 
 
@@ -143,7 +145,7 @@ class ConfigurationSuper:
         """
         self._filename: str = ""
         _load_defaults()
-        _parse_env()
+        _parse_env(env_args=kwargs.get("env_args"))
         self._filetype: str = ""
 
         # parse file
@@ -213,8 +215,8 @@ class ConfigurationSuper:
         else:
             return self._config[key] or False
 
-    def save(self):
+    def save(self, file):
         """
         placeholder for save function in subclasses
         """
-        self.file_object.write()
+        self.file_object.write(file)
